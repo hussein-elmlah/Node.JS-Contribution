@@ -1,3 +1,3 @@
-# ToDo CLI App 
+# Node js Projects
 
-this is a simple todo command line interface (CLI) app built with nodejs
+this is a dedicated repo for some Nodejs projects.
