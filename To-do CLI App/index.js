@@ -1,23 +1,75 @@
+const { program } = require('commander');
 const fs = require('fs');
 
-function main(passedOption) {
 
-    // CRUD options
-    var options = {
-        'add': () => { add() },
-        'list': () => { list() },
-        'edit': () => { edit() },
-        'delete': () => { deleteTodo() },
-        'default': () => { console.log('Unknown Option | Only Allowed (add - edit - list - delete)'); },
+program.version('1.5.0');
+
+program
+    .command('edit')
+    .description('To edit todo title, or status by id')
+    .alias('e')
+    .action(function(){
+        edit(3, 4);
+    })
+    .option('-s, --status', 'To change a todo status')
+    .action(function () {
+        edit(4, 5);
+    })
+
+program
+    .command('list')
+    .description('To list all todos')
+    .alias('l')
+    .action(function(){
+        list();
+    })
+    .option('-s, --status', 'To list by a specific status')
+    .action(function () {
+        list(process.argv[4]);
+    })
+
+program
+    .command('add')
+    .description('To add a new todo')
+    .alias('a')
+    .action(function(){
+        add();
+    })
+
+program
+    .command('delete')
+    .description('To delete a todo by id')
+    .alias('d')
+    .action(function(){
+        deleteTodo();
+    })
+
+
+
+program.parse(process.argv);
+
+
+/**
+ *  process.argv[2] = option
+ *  process.argv[3] = id
+ *  process.argv[4] = title 
+ */
+
+/**
+ * Diplays all todos after checking the file as well
+ * @param {*} statusToFilterBy 
+ */
+function list(statusToFilterBy){
+    if (checkFile()) {
+        var todos = checkFile();
+        if (statusToFilterBy) {
+            var filteredTodos = todos.filter((todo) => todo.status === statusToFilterBy);
+            console.log(filteredTodos);
+        } else {
+            console.log(todos);
+        }
     }
-    try { options[passedOption](); }
-    catch (err) { options['default'](); }//default behaviour
 }
-
-
-// Driver Function
-main(process.argv[2]);
-
 
 /**
  * Deletes todo by id
@@ -47,21 +99,25 @@ function deleteTodo() { // delete is reserved as keyword in VS code
 /**
  * Edits todo by id
  */
-function edit() {
+function edit(indexOfId, indexOfField) {
 
-    if (checkFile() && process.argv[3]) {
+    if (checkFile() && process.argv[indexOfId]) {
         var todos = checkFile();
 
         // We should parse to int as arguments are string by default.
-        var updatedTodo = todos.find((todo) => todo.id === parseInt(process.argv[3]));
+        var updatedTodo = todos.find((todo) => todo.id === parseInt(process.argv[indexOfId]));
 
         // Assure that this todo is already there.
-        if (typeof updatedTodo !== "undefined" && process.argv[4]) {
+        if (typeof updatedTodo !== "undefined" && process.argv[indexOfField]) {
 
-            updatedTodo.title = process.argv[4];
+            if (indexOfId === 3 && indexOfField === 4) {
+                updatedTodo.title = process.argv[indexOfField];
+            }else{
+                updatedTodo.status = process.argv[indexOfField];
+            }
 
             for (var todo of todos) {
-                if (todo.id === parseInt(process.argv[3]))
+                if (todo.id === parseInt(process.argv[indexOfId]))
                     todo = updatedTodo;
             }
 
@@ -74,17 +130,6 @@ function edit() {
         console.warn("Check your id input");
     }
 
-}
-
-
-/**
- * Diplays all todos after checking the file as well
- */
-function list() {
-    if (checkFile()) {
-        var todos = checkFile();
-        console.log(todos);
-    }
 }
 
 
@@ -106,6 +151,8 @@ function add() {
 
         todos.push(todo);
         fs.writeFile('./todos.json', JSON.stringify(todos), () => {});  // stringify when write
+    }else{
+        console.error("Check your input");
     }
 }
 

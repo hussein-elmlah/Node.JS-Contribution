@@ -1,0 +1,14 @@
+{
+  "name": "todo_cli_app",
+  "version": "1.0.0",
+  "description": "this is a simple todo command line interface (CLI) app built with nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abdulrhman_Elshikh",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^12.0.0"
+  }
+}
