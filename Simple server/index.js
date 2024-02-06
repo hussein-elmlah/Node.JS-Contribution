@@ -35,7 +35,6 @@ server.createServer(function (req, res) {
         // convert back again to string with pretty presentation
         newData = JSON.stringify(newData, null, "\t")
         res.write(newData);
-        res.write(imageData);
 
     }else if (url === '/astronomy') {
 
