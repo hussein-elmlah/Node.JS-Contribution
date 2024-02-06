@@ -1,6 +1,5 @@
 const fs = require('fs');
 const server = require('http');
-const path = require('path');
 
 var todosData = '';
 
@@ -17,13 +16,12 @@ readStream.on('error', (err) => {
     console.error(err)
 })
 
+// res.end() position is very important
 
 // initiate a server
 server.createServer(function (req, res) {
 
-    const url = req.url;
-
-    if (url === '/') {
+    if (req.url === '/') {
         // convert from string to Json
         var newData = JSON.parse(todosData);
 
@@ -33,16 +31,21 @@ server.createServer(function (req, res) {
         }
 
         // convert back again to string with pretty presentation
-        newData = JSON.stringify(newData, null, "\t")
-        res.write(newData);
+        const FinalData = JSON.stringify(newData, null, "\t")
+        res.write(FinalData);
+        res.end();
 
-    }else if (url === '/astronomy') {
+    }else if (req.url === '/astronomy') {
 
-        res.write('<html>');
-        res.write('<head><title>Astronomy</title></head>')
-        res.write('<body> <img src="https://media.cnn.com/api/v1/images/stellar/prod/200505225212-04-fossils-and-climate-change-museum.jpg?q=x_0,y_0,h_1125,w_1999,c_fill/h_720,w_1280"> </body>')
-        res.write('</html');
-        return res.end();
+        fs.readFile('image.jpg', (err, data) => {
+            if (err) {
+                res.writeHead(500, {'Content-Type' : 'text/plain'});
+                res.end('Internal Server Error');
+            } else {
+                res.writeHead(200, {'Content-Type' : 'image/jpeg'})
+                res.end(data)
+            }
+        });
 
     } else {
 
@@ -50,10 +53,10 @@ server.createServer(function (req, res) {
         res.write('<head><title>No</title></head>')
         res.write('<body> 404 </body>')
         res.write('</html');
+        res.end();
     }
 
     // write to the response
-    res.end();
 }).listen(3000, () => console.log('listening ...'));
 
 
