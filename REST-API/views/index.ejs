@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos Page</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Todos Page</h1>
+    </header>
+    <main>
+
+        <h2>HTML Table</h2>
+
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Status</th>
+            </tr>
+            
+            <% data.forEach(todo => { %>
+                <tr>
+                        <td><%= todo.id %></td>
+                        <td><%= todo.title %></td>
+                        <td><%= todo.status %></td>
+                </tr>
+            <% }); %>
+        </table>
+
+    </main>
+</body>
+
+</html>

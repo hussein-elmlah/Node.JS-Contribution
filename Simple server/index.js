@@ -1,6 +1,7 @@
 const fs = require('fs');
 const server = require('http');
 
+// change this scope
 var todosData = '';
 
 /** -----------Todos File ----------------------- */

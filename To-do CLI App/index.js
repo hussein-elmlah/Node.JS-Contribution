@@ -123,6 +123,8 @@ function edit(indexOfId, indexOfField) {
                     todo = updatedTodo;
             }
 
+            // writeFile needs callback as a second argument as it returns ...
+            // but writeFileSync doesn't as it does not return ....
             fs.writeFile('./todos.json', JSON.stringify(todos), () => {});
 
         } else {
