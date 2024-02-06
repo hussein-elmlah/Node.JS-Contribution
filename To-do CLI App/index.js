@@ -8,9 +8,11 @@ program
     .command('edit')
     .description('To edit todo title, or status by id')
     .alias('e')
+    // Not working  = Bug
     .action(function(){
         edit(3, 4);
     })
+    /// Working fine
     .option('-s, --status', 'To change a todo status')
     .action(function () {
         edit(4, 5);
