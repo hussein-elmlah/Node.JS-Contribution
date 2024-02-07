@@ -1,5 +1,8 @@
 const fs = require('fs');
 const express = require('express');
+const create = require('./Helpers/read');
+const readTodo = require('./Helpers/readTodo');
+const helper = require('./Helpers/helper');
 const app = express();
 
 // Middleware to parse JSON data
@@ -57,84 +60,46 @@ app.post('/todos', (req, res) => {
 
 // Root | Home | Main
 app.get('/todos', (req, res) => {
-
-    fs.readFile('todos.json', 'utf8', (err, data) => {
-        try {
-            let todosData = JSON.parse(data);
-            // res.json(todosData);
-            const statusNeedle = req.query.status
-            todosData = (statusNeedle) ? todosData.filter(t => t.status === statusNeedle) : todosData;
-            res.render('index', { data: todosData })
-        } catch (error) {
-            console.error("error")
-            res.status('500').send('Internal Server Error');
-        }
-    });
-
+    create(req, res)
 });
 
 
 // Specific resource + Validation if not found
 app.get('/todos/:id', (req, res) => {
-    fs.readFile('todos.json', 'utf8', (err, data) => {
-        try {
-            const todosData = JSON.parse(data);
-            const target = todosData.find(t => t.id === parseInt(req.params.id))
-            if (target) res.send(target);
-            else throw new Error
-        } catch (error) {
-            res.status('404').send(`error - 404 Not Found`);
-        }
-    });
+    readTodo(req, res);
 });
 
 
 // Update a resource + Validation if not found + Validation on input
 app.patch('/todos/:id', (req, res) => {
+    helper(req, res, (target, todosData) => {
+        const [title, status = target.status] = [req.body.title, req.body.status]
+        const allowedStatuses = ["to-do", "done", "in-progress"];
 
-    fs.readFile('todos.json', 'utf8', (err, data) => {
-        try {
-            const todosData = JSON.parse(data);
-            const target = todosData.find(t => t.id === parseInt(req.params.id))
+        // validation
+        if (typeof title !== 'string' || !allowedStatuses.includes(status)) {
+            res.status(403).send("Bad input")
+        } else {
 
-            const [title, status = target.status] = [req.body.title, req.body.status]
-            const allowedStatuses = ["to-do", "done", "in-progress"];
+            target.id = (req.body.id) ?? target.id
+            target.title = (req.body.title) ?? target.title
+            target.status = (req.body.status) ?? target.status
 
-            if (typeof title !== 'string' || !allowedStatuses.includes(status)) {
-                res.status(403).send("Bad input")
-            } else {
-
-                target.id = (req.body.id) ?? target.id
-                target.title = (req.body.title) ?? target.title
-                target.status = (req.body.status) ?? target.status
-
-                fs.writeFileSync('./todos.json', JSON.stringify(todosData, null, 2))
-                res.send(target);
-            }
-        } catch (error) {
-            res.status('404').send('error 404 - not found');
+            fs.writeFileSync('./todos.json', JSON.stringify(todosData, null, 2))
+            res.send(target);
         }
-    });
+    })
 });
-
 
 // Delete a resource + Validation if not found
 app.delete('/todos/:id', (req, res) => {
 
-    fs.readFile('todos.json', 'utf8', (err, data) => {
-
-        try {
-            let todosData = JSON.parse(data);
-            const target = todosData.find(t => t.id === parseInt(req.params.id))
-            todosData = todosData.filter(t => t.id !== parseInt(target.id))
-
-            fs.writeFileSync('./todos.json', JSON.stringify(todosData, null, 2))
-            res.send('deleted');
-        } catch (error) {
-            res.status('404').send(`error - 404 Not Found`);
-        }
-
-    });
+    helper(req, res, (target, todosData) => {
+        todosData = todosData.filter(t => t.id !== parseInt(target.id))
+        fs.writeFileSync('./todos.json', JSON.stringify(todosData, null, 2))
+        res.send('deleted');
+    })
+  
 });
 
 
