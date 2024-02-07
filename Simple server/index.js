@@ -4,6 +4,13 @@ const server = require('http');
 // change this scope
 var todosData = '';
 
+/**
+ * Use streams for the image (think of chunking - buffer - concat())
+ * Add a description below it
+ * Style the home page with css files (think of .replace())
+ * Make an option to download the image (usually using a button)
+ */
+
 /** -----------Todos File ----------------------- */
 const readStream = fs.createReadStream('todos.json');
 readStream.setEncoding('UTF8');
