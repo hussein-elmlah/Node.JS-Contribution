@@ -1,6 +1,6 @@
 const fs = require('fs');
 const express = require('express');
-const create = require('./Helpers/read');
+const read = require('./Helpers/read');
 const readTodo = require('./Helpers/readTodo');
 const helper = require('./Helpers/helper');
 const app = express();
@@ -60,7 +60,7 @@ app.post('/todos', (req, res) => {
 
 // Root | Home | Main
 app.get('/todos', (req, res) => {
-    create(req, res)
+    read(req, res)
 });
 
 
@@ -69,10 +69,10 @@ app.get('/todos/:id', (req, res) => {
     readTodo(req, res);
 });
 
-
 // Update a resource + Validation if not found + Validation on input
 app.patch('/todos/:id', (req, res) => {
-    helper(req, res, (target, todosData) => {
+
+    const patchCallback = (target, todosData) => {
         const [title, status = target.status] = [req.body.title, req.body.status]
         const allowedStatuses = ["to-do", "done", "in-progress"];
 
@@ -88,7 +88,11 @@ app.patch('/todos/:id', (req, res) => {
             fs.writeFileSync('./todos.json', JSON.stringify(todosData, null, 2))
             res.send(target);
         }
-    })
+    };
+
+    // passing a reference to a function as a callback
+    helper(req, res, patchCallback)
+
 });
 
 // Delete a resource + Validation if not found
@@ -99,7 +103,7 @@ app.delete('/todos/:id', (req, res) => {
         fs.writeFileSync('./todos.json', JSON.stringify(todosData, null, 2))
         res.send('deleted');
     })
-  
+
 });
 
 
