@@ -131,7 +131,7 @@ function deleteTodo() { // delete is reserved as keyword in VS code
     }
 
     fs.writeFile('./todos.json', JSON.stringify(todos), () => {});
-  }
+  } 
 
 
 
