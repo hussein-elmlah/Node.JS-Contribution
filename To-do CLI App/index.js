@@ -22,9 +22,6 @@ program
     .command('list')
     .description('To list all todos')
     .alias('l')
-    .action(function(){
-        list();
-    })
     .option('-s, --status', 'To list by a specific status')
     .action(function () {
         list(process.argv[4]);
@@ -62,6 +59,7 @@ program.parse(process.argv);
  * @param {*} statusToFilterBy 
  */
 function list(statusToFilterBy){
+    console.log(statusToFilterBy);
     if (checkFile()) {
         var todos = checkFile();
         if (statusToFilterBy) {
