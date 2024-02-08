@@ -1,22 +1,22 @@
 const { program } = require('commander');
 const fs = require('fs');
+const { title } = require('process');
 
 
 program.version('1.5.0');
 
 program
-    .command('edit')
+    .command('edit <id>')
     .description('To edit todo title, or status by id')
     .alias('e')
     // Not working  = Bug
-    .action(function(){
-        edit(3, 4);
+    .option('-t, --title <string>', 'to change a todo title')
+    .option('-s, --status <string>', 'To change a todo status')
+    .action((id, options)=>{
+        edit(id, options);
     })
     /// Working fine
-    .option('-s, --status', 'To change a todo status')
-    .action(function () {
-        edit(4, 5);
-    })
+
 
 program
     .command('list')
@@ -101,40 +101,38 @@ function deleteTodo() { // delete is reserved as keyword in VS code
 /**
  * Edits todo by id
  */
-function edit(indexOfId, indexOfField) {
+ function edit(id, options) {
+    let todos = checkFile();
+    let taskToEdit = todos.find((task) => task.id === Number(id));
 
-    if (checkFile() && process.argv[indexOfId]) {
-        var todos = checkFile();
-
-        // We should parse to int as arguments are string by default.
-        var updatedTodo = todos.find((todo) => todo.id === parseInt(process.argv[indexOfId]));
-
-        // Assure that this todo is already there.
-        if (typeof updatedTodo !== "undefined" && process.argv[indexOfField]) {
-
-            if (indexOfId === 3 && indexOfField === 4) {
-                updatedTodo.title = process.argv[indexOfField];
-            }else{
-                updatedTodo.status = process.argv[indexOfField];
-            }
-
-            for (var todo of todos) {
-                if (todo.id === parseInt(process.argv[indexOfId]))
-                    todo = updatedTodo;
-            }
-
-            // writeFile needs callback as a second argument as it returns ...
-            // but writeFileSync doesn't as it does not return ....
-            fs.writeFile('./todos.json', JSON.stringify(todos), () => {});
-
-        } else {
-            console.warn("Check your input!");
-        }
-    } else {
-        console.warn("Check your id input");
+    if (!taskToEdit) {
+      console.error(`No task found with ID ${id}`);
+      return;
+    }
+  
+    if (!options.title && !options.status) {
+      console.error('Specify -t or -s or both to update the task.');
+      return;
+    }
+  
+    if (options.title) {
+      taskToEdit.title = options.title;
+      console.log(`To-do task with ID ${id} edited: ${taskToEdit.title}`);
+    }
+  
+    if (options.status) {
+      if (['to-do', 'in-progress', 'done'].includes(options.status)) {
+        taskToEdit.status = options.status;
+        console.log(`To-do task with ID ${id} marked as '${taskToEdit.status}'`);
+      } else {
+        console.error('Invalid status. Allowed values: to-do, in-progress, done.');
+        return;
+      }
     }
 
-}
+    fs.writeFile('./todos.json', JSON.stringify(todos), () => {});
+  } 
+
 
 
 /**
