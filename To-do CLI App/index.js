@@ -66,7 +66,7 @@ function list(statusToFilterBy){
             var filteredTodos = todos.filter((todo) => todo.status === statusToFilterBy);
             console.log(filteredTodos);
         } else {
-            console.log(todos);
+            console.log(todos); 
         }
     }
 }
