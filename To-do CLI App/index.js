@@ -12,7 +12,7 @@ program
     .action(function (options) {
         if (!options.status) {
             edit(3, 4);
-        } else {
+        } else { 
             edit(4, 5);
         }
     })
